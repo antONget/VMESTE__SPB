@@ -6,8 +6,8 @@ from aiogram.fsm.state import State, StatesGroup
 
 
 from config_data.config import Config, load_config
-from keyboards.admin_add_card_keyboards import create_keyboard_list, keyboard_add_subcategory, keyboards_continue_image,\
-    keyboard_add_instagram, keyboard_details, keyboard_full_text, keyboard_full_text_1
+from keyboards.admin_add_card_keyboards import create_keyboard_list, keyboard_add_subcategory,\
+    keyboards_continue_image, keyboard_add_instagram, keyboard_details, keyboard_full_text, keyboard_full_text_1
 from filter.admin_filter import IsSuperAdmin
 from database import requests as rq
 
@@ -55,6 +55,7 @@ async def process_add_category_card(message: Message, state: FSMContext, bot: Bo
     Получаем название новой категории. Запрашиваем требуется ли добавить подкатегорию для категории
     :param message:
     :param state:
+    :param bot:
     :return:
     """
     logging.info(f'process_add_category_card: {message.chat.id}')
@@ -161,6 +162,7 @@ async def get_image_card(message: Message, state: FSMContext, bot: Bot) -> None:
     Получаем фотографию для добавления в карточку места
     :param message:
     :param state:
+    :param bot:
     :return:
     """
     logging.info(f'get_image_card: {message.chat.id}')
@@ -289,6 +291,7 @@ async def process_add_noinstagram_card(callback: CallbackQuery, state: FSMContex
     Обрабатываем нажатие если у заведения нет инстаграмм
     :param callback:
     :param state:
+    :param bot:
     :return:
     """
     logging.info(f'process_add_noinstagram_card: {callback.message.chat.id}')
@@ -366,17 +369,13 @@ async def process_details(callback: CallbackQuery, state: FSMContext) -> None:
     """
     logging.info(f'process_details: {callback.message.chat.id}')
     data = await state.update_data()
-    # media = []
-    # list_image = data["image_id_list_image"]
-    # for image in list_image:
-    #     media.append(InputMediaPhoto(media=image))
-    # await callback.message.answer_media_group(media=media)
+
     if data['instagram_card'] != 'none':
         await callback.message.edit_text(text=f'<b>{data["title_card"]}</b>\n'
                                               f'{data["long_card"]}\n'
                                               f'<i>{data["address_card"]}</i>',
                                          reply_markup=keyboard_full_text(data["yandex_card"],
-                                                                      data["instagram_card"]),
+                                                                         data["instagram_card"]),
                                          parse_mode='html')
     else:
         await callback.message.edit_text(text=f'<b>{data["title_card"]}</b>\n'

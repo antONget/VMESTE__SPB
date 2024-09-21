@@ -196,12 +196,12 @@ async def show_card_event(message: Message, state: FSMContext, list_event: list[
     await state.update_data(count_event_show=count_event_show)
     for info_event in list_event[count_event_show - count_show:count_event_show]:
         media = []
-        list_image = info_event.list_image.split(',')
+        list_image = info_event["list_image"].split(',')
         for image in list_image:
             media.append(InputMediaPhoto(media=image))
         await message.answer_media_group(media=media)
-        await message.answer(text=f'<b>{info_event.title}</b>\n{info_event.short_description}',
-                             reply_markup=keyboard_details(info_event.id_place),
+        await message.answer(text=f'<b>{info_event["title"]}</b>\n{info_event["short_description"]}',
+                             reply_markup=keyboard_details(info_event["id_place"]),
                              parse_mode='html')
     if len(list_event) > count_event_show:
         await message.answer(text='Не хватило мест?',

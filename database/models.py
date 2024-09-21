@@ -3,7 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 
 
-engine = create_async_engine(url="sqlite+aiosqlite:///database/1.sqlite3", echo=False)
+engine = create_async_engine(url="sqlite+aiosqlite:///database/db.sqlite3", echo=False)
 async_session = async_sessionmaker(engine)
 
 
@@ -22,7 +22,7 @@ class User(Base):
 class Place(Base):
     __tablename__ = 'places'
 
-    id_place: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(20))
     short_description: Mapped[str] = mapped_column(String(20))
     long_description: Mapped[str] = mapped_column(String(20))

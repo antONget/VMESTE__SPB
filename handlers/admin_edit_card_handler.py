@@ -1,16 +1,15 @@
-from aiogram import Router, F, Bot
-from aiogram.filters import CommandStart, StateFilter
+from aiogram import Router, F
+from aiogram.filters import StateFilter
 from aiogram.types import Message, CallbackQuery, InputMediaPhoto
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup, default_state
+from aiogram.fsm.state import State, StatesGroup
 
 
 from config_data.config import Config, load_config
 from keyboards.admin_edit_card_keyboard import create_keyboard_list, keyboard_details_edit, keyboards_edit_attribute, \
     keyboard_full_text, keyboard_full_text_1
 from keyboards.admin_main_keyboards import keyboards_start_admin
-# from module.data_base import get_list_category, get_list_subcategory, get_list_card, \
-#     info_card, set_attribute_card, set_position_card, set_position_category
+
 from database import requests as rq
 from database.models import Place
 from filter.admin_filter import IsSuperAdmin
@@ -121,7 +120,7 @@ async def process_select_category_card(callback: CallbackQuery, state: FSMContex
     list_id_card = []
     for card in list_card:
         list_title_card.append(card.title)
-        list_id_card.append(card.id_place)
+        list_id_card.append(card.id)
     await callback.message.edit_text(text='Выберите заведение для редактирования',
                                      reply_markup=create_keyboard_list(list_name_button=list_title_card,
                                                                        str_callback='edittitle_card',
@@ -140,7 +139,7 @@ async def process_select_title_card(callback: CallbackQuery, state: FSMContext) 
     await state.update_data(title=callback.data.split(":")[1])
     # получаем информацию о месте по его названию
     card: Place = await rq.info_card(int(callback.data.split(":")[1]))
-    await state.update_data(id_card=card.id_place)
+    await state.update_data(id_card=card.id)
     # формируем контент для карточки
     media = []
     list_image: list = card.list_image.split(',')
@@ -149,7 +148,7 @@ async def process_select_title_card(callback: CallbackQuery, state: FSMContext) 
     await callback.message.answer_media_group(media=media)
     await callback.message.answer(text=f'<b>{card.title}</b>\n'
                                        f'{card.short_description}',
-                                  reply_markup=keyboard_details_edit(card.id_place),
+                                  reply_markup=keyboard_details_edit(card.id),
                                   parse_mode='html')
     # клавиатура для выбора действия для редактирования
     await callback.message.answer(text='Выберите поля для редактирования',
@@ -176,7 +175,7 @@ async def process_details(callback: CallbackQuery) -> None:
         await callback.message.edit_text(text=f'<b>{card.title}</b>\n'
                                               f'{card.long_description}\n'
                                               f'<i>{card.address}</i>',
-                                         reply_markup=keyboard_full_text_1(card[6]),
+                                         reply_markup=keyboard_full_text_1(card.yandex_map),
                                          parse_mode='html')
 
 
@@ -218,7 +217,7 @@ async def process_update_card(message: Message, state: FSMContext) -> None:
         data = await state.get_data()
         if 'subcategory' not in data.keys():
             await rq.set_position_card(category=data['category'],
-                                       sub_category='None',
+                                       sub_category='none',
                                        id_card=int(data['id_card']))
         else:
             await rq.set_position_card(category=data['category'],
@@ -263,4 +262,3 @@ async def process_update_card(message: Message, state: FSMContext) -> None:
                                     set_attribute=message.text,
                                     id_card=int(data['id_card']))
         await message.answer(text='Поле обновлено')
-

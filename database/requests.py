@@ -102,7 +102,7 @@ async def get_list_card(category: str, sub_category: str) -> list:
 
         set_list = []
         for place in places:
-            set_list.append({"id_place": place.id_place,
+            set_list.append({"id_place": place.id,
                              "title": place.title,
                              "short_description": place.short_description,
                              "long_description": place.long_description,
@@ -120,7 +120,7 @@ async def info_card(id_card: int) -> Place:
     """
     logging.info(f'info_card')
     async with async_session() as session:
-        return await session.scalar(select(Place).where(Place.id_place == id_card))
+        return await session.scalar(select(Place).where(Place.id == id_card))
 
 
 async def set_count_show_card(count: int, id_card: int) -> None:
@@ -132,20 +132,30 @@ async def set_count_show_card(count: int, id_card: int) -> None:
     """
     logging.info(f'set_count_show_card')
     async with async_session() as session:
-        place = await session.scalar(select(Place).where(Place.id_place == id_card))
+        place = await session.scalar(select(Place).where(Place.id == id_card))
         place.count_link = count
         await session.commit()
 
 
-async def get_list_card_event() -> list[Place]:
+async def get_list_card_event() -> list:
     """
     Получаем список карточек мероприятий
     :return:
     """
     logging.info(f'get_list_card_event')
     async with async_session() as session:
-        places = await session.scalars(select(Place).where(Place.category == "🎧Мероприятия недели"))
-        return [place for place in places]
+        places = await session.scalars(select(Place).where(Place.category == "🎧Мероприятия недели").order_by(Place.position))
+        set_list = []
+        for place in places:
+            set_list.append({"id_place": place.id,
+                             "title": place.title,
+                             "short_description": place.short_description,
+                             "long_description": place.long_description,
+                             "address": place.address,
+                             "instagram": place.instagram,
+                             "yandex_map": place.yandex_map,
+                             "list_image": place.list_image})
+        return set_list
 
 
 async def get_list_card_stat() -> list:
@@ -166,7 +176,7 @@ async def delete_card(id_place: int) -> None:
     """
     logging.info(f'delete_card')
     async with async_session() as session:
-        place = await session.scalar(select(Place).where(Place.id_place == id_place))
+        place = await session.scalar(select(Place).where(Place.id == id_place))
         await session.delete(place)
         await session.commit()
 
@@ -208,12 +218,13 @@ async def set_position_card(category: str, sub_category: str, id_card: int) -> N
     Обновляем позицию карточки заведения
     :return:
     """
-    logging.info(f'set_position_category')
+    logging.info(f'set_position_category: category-{category} sub_category-{sub_category} id_card-{id_card}')
     async with async_session() as session:
         places = await session.scalars(select(Place).where(Place.category == category,
                                                            Place.sub_category == sub_category).order_by(Place.position))
         for place in places:
-            if place.id_place == id_card:
+            print(place.title)
+            if place.id == id_card:
                 place.position = 0
             else:
                 place.position += 1
@@ -227,7 +238,7 @@ async def set_attribute_card(attribute: str, set_attribute: str, id_card: int) -
     """
     logging.info(f'set_position_category')
     async with async_session() as session:
-        place = await session.scalar(select(Place).where(Place.id_place == id_card))
+        place = await session.scalar(select(Place).where(Place.id == id_card))
         if attribute == 'title':
             place.title = set_attribute
         elif attribute == 'category':
