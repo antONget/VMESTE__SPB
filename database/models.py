@@ -14,7 +14,7 @@ class Base(AsyncAttrs, DeclarativeBase):
 class User(Base):
     __tablename__ = 'users'
 
-    id_user: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
     tg_id = mapped_column(Integer)
     username: Mapped[str] = mapped_column(String(20))
 
