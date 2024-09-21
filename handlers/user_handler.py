@@ -34,7 +34,7 @@ async def process_start_command_user(message: Message, state: FSMContext) -> Non
     :return:
     """
     logging.info(f'process_start_command_user: {message.chat.id}')
-    await state.update_data(state=None)
+    await state.set_state(state=None)
     await rq.add_user(tg_id=message.chat.id,
                       data={"tg_id": message.chat.id, "username": message.from_user.username})
     await message.answer(text=f'Привет, друг/подружка!\n\n'
@@ -163,7 +163,7 @@ async def process_details(callback: CallbackQuery) -> None:
     :return:
     """
     logging.info(f'process_details: {callback.message.chat.id}')
-    id_card = callback.data.split(':')[1]
+    id_card = int(callback.data.split(':')[1])
     card = await rq.info_card(int(id_card))
     count = card.count_link + 1
     await rq.set_count_show_card(count=count, id_card=id_card)
