@@ -120,9 +120,14 @@ async def process_select_category_card(callback: CallbackQuery, state: FSMContex
     print(list_subcategory)
     # если у категории есть подкатегории
     if list_subcategory != ['none']:
-        await callback.message.edit_text(text=f'Выберите подкатегорию места',
-                                         reply_markup=create_keyboard_list(list_name_button=list_subcategory,
-                                                                           str_callback='usersubcategory'))
+        try:
+            await callback.message.edit_text(text=f'Выберите подкатегорию места',
+                                             reply_markup=create_keyboard_list(list_name_button=list_subcategory,
+                                                                               str_callback='usersubcategory'))
+        except:
+            await callback.message.answer(text=f'Выберите подкатегорию места',
+                                          reply_markup=create_keyboard_list(list_name_button=list_subcategory,
+                                                                            str_callback='usersubcategory'))
     # иначе отображаем карточки мест выбранной категории
     else:
         await callback.message.answer(text=f'Подкатегорий у категории нет')
