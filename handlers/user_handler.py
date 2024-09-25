@@ -173,11 +173,18 @@ async def process_details(callback: CallbackQuery) -> None:
     count = card.count_link + 1
     await rq.set_count_show_card(count=count, id_card=id_card)
     if card.instagram != 'none':
-        await callback.message.edit_text(text=f'<b>{card.title}</b>\n'
-                                              f'{card.long_description}\n'
-                                              f'<i>{card.address}</i>',
-                                         reply_markup=keyboard_full_text(card.yandex_map, card.instagram),
-                                         parse_mode='html')
+        try:
+            await callback.message.edit_text(text=f'<b>{card.title}</b>\n'
+                                                  f'{card.long_description}\n'
+                                                  f'<i>{card.address}</i>',
+                                             reply_markup=keyboard_full_text(card.yandex_map, card.instagram),
+                                             parse_mode='html')
+        except:
+            await callback.message.edit_text(text=f'<b>{card.title}.</b>\n'
+                                                  f'{card.long_description}\n'
+                                                  f'<i>{card.address}</i>',
+                                             reply_markup=keyboard_full_text(card.yandex_map, card.instagram),
+                                             parse_mode='html')
     else:
         await callback.message.edit_text(text=f'<b>{card.title}</b>\n'
                                               f'{card.long_description}\n'
