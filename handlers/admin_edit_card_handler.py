@@ -118,9 +118,10 @@ async def process_select_category_card(callback: CallbackQuery, state: FSMContex
                                                     data['subcategory'])
     list_title_card = []
     list_id_card = []
-    for card in list_card:
-        list_title_card.append(card.title)
-        list_id_card.append(card.id)
+    if list_card:
+        for card in list_card:
+            list_title_card.append(card["title"])
+            list_id_card.append(card["id_place"])
     await callback.message.edit_text(text='Выберите заведение для редактирования',
                                      reply_markup=create_keyboard_list(list_name_button=list_title_card,
                                                                        str_callback='edittitle_card',
